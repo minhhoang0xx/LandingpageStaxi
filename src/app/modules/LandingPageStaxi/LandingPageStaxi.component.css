@@ -1,9 +1,9 @@
 * {
   box-sizing: border-box;
 }
-.landing-page {
+/* .landing-page {
   
-}
+} */
 
 .orange {
   color: #f2480d;
@@ -427,8 +427,10 @@ main{
 }
 
 .section-5-line {
-  margin-top: -20px;
+  margin-top: -40px;
   font-weight: bold;
+  font-size: 30px;
+  padding-bottom: 20px;
 }
 
 .section-5-logo {
