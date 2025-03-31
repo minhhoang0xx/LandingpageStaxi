@@ -1,0 +1,72 @@
+<div class="container-fluid">
+  <div class="text-center" *ngIf="isLoading">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-12">
+      <div class="input-group">
+        <select class="form-select me-2" [(ngModel)]="selectedProject" (ngModelChange)="filterData()">
+          <option value="all">Tất cả dự án</option>
+          <option *ngFor="let domain of domains" [value]="domain">{{domain}}</option>
+        </select>
+        <input type="text" class="form-control" placeholder="Tìm kiếm theo đường dẫn" 
+               [(ngModel)]="searchText" (ngModelChange)="filterData()">
+        <button class="btn btn-primary ms-2" (click)="openCreateModal()">Tạo mới</button>
+        <button class="btn btn-primary ms-2" (click)="exportExcel()">Xuất Excel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th *ngFor="let column of columns" [style.width]="column.width">{{column.title}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of filteredData">
+          <td>{{data.STT}}</td>
+          <td>{{data.projectName}}</td>
+          <td>{{data.alias}}</td>
+          <td><a [href]="data.originalUrl" target="_blank">{{data.originalUrl}}</a></td>
+          <td><a [href]="data.shortLink" target="_blank">{{data.shortLink}}</a></td>
+          <td>{{data.createAt}}</td>
+          <td>{{data.userName}}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary me-2" (click)="openUpdateModal(data)">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" (click)="openDeleteModal(data)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Gọi các modal component -->
+  <app-update-modal 
+    [visible]="showUpdateModal" 
+    [record]="selectedRecord" 
+    (update)="handleUpdate()" 
+    (cancel)="closeModal()">
+  </app-update-modal>
+
+  <app-delete-modal 
+    [visible]="showDeleteModal" 
+    [record]="recordToDelete" 
+    (delete)="handleDelete()" 
+    (cancel)="closeModal()">
+  </app-delete-modal>
+
+  <app-create-modal 
+    [visible]="showCreateModal" 
+    (create)="handleCreate()" 
+    (cancel)="closeModal()">
+  </app-create-modal>
+</div>

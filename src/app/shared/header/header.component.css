@@ -1,0 +1,26 @@
+
+.header {
+    background-color: #2D9CDB;
+    color: #ffffff;
+    border-bottom: 2px solid #2D9CDB;
+    justify-content: center;
+
+
+}
+.header-content {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.header-content span {
+    font-weight: bold;
+}
+
+.logo {
+    height: 50px;
+    padding: 5px 0;
+    padding-right: 20px;
+    filter: brightness(0) invert(1);
+}
+/* ----------------------------------------end header----------------------------------- */
