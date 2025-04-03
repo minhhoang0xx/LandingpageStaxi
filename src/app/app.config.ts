@@ -5,6 +5,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { importProvidersFrom } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+ 
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,5 +15,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     importProvidersFrom(BrowserModule), 
     importProvidersFrom(FormsModule),  
+
   ]
 };
