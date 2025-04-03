@@ -5,8 +5,8 @@
     </div>
   </div>
 
-  <div class="row mb-3">
-    <div class="col-md-12">
+  <div class="">
+    <div class="">
       <div class="input-group">
         <select class="form-select me-2" [(ngModel)]="selectedProject" (ngModelChange)="filterData()">
           <option value="all">Tất cả dự án</option>
@@ -24,7 +24,7 @@
     <table class="table table-bordered table-hover">
       <thead class="table-light">
         <tr>
-          <th *ngFor="let column of columns" [style.width]="column.width">{{column.title}}</th>
+          <th class="table-light-title" *ngFor="let column of columns" [style.width]="column.width">{{column.title}}</th>
         </tr>
       </thead>
       <tbody>
@@ -53,20 +53,20 @@
   <app-update-modal 
     [visible]="showUpdateModal" 
     [record]="selectedRecord" 
-    (update)="handleUpdate()" 
-    (cancel)="closeModal()">
+    (onUpdate)="handleAction()" 
+    (onCancel)="closeModal()">
   </app-update-modal>
 
   <app-delete-modal 
     [visible]="showDeleteModal" 
     [record]="recordToDelete" 
-    (delete)="handleDelete()" 
-    (cancel)="closeModal()">
+    (onDelete)="handleAction()" 
+    (onCancel)="closeModal()">
   </app-delete-modal>
 
   <app-create-modal 
     [visible]="showCreateModal" 
-    (create)="handleCreate()" 
-    (cancel)="closeModal()">
+    (onCreate)="handleAction()" 
+    (onCancel)="closeModal()">
   </app-create-modal>
 </div>
