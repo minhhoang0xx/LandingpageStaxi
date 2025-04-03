@@ -1,42 +1,42 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ShortURLService } from '../../../../services/ShortURLService';
+import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-delete-modal',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="modal" [class.show]="visible" [style.display]="visible ? 'block' : 'none'">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Confirm Delete</h5>
-            <button type="button" class="btn-close" (click)="onCancel()"></button>
-          </div>
-          <div class="modal-body">
-            Are you sure you want to delete {{record?.alias}}?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-            <button type="button" class="btn btn-danger" (click)="onDelete()">Delete</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-backdrop fade" [class.show]="visible" *ngIf="visible"></div>
-  `,
-  styles: []
+  templateUrl: './delete-modal.component.html',
+  styleUrls:['delete-modal.component.css']
 })
 export class DeleteModalComponent {
   @Input() visible: boolean = false;
   @Input() record: any = null;
-  @Output() delete = new EventEmitter<void>();
-  @Output() cancel = new EventEmitter<void>();
+  @Output() onDelete = new EventEmitter<void>();
+  @Output() onCancel = new EventEmitter<void>();
 
-  onDelete() {
-    this.delete.emit();
+  constructor(private ShortURLService: ShortURLService) {}
+
+  async handleDelete() {
+    if (!this.record || !this.record.id) {
+      alert('Không có dữ liệu để xóa!');
+      return;
+    }
+    try {
+      // const response = await firstValueFrom(this.ShortURLService.deleteShortLink(this.record.id));
+      // if (response) {
+        alert('Xóa thành công!');
+        this.onDelete.emit();
+      // } else {
+      //   alert('Xóa thất bại!');
+      // }
+    } catch (error) {
+      console.error('Lỗi khi xóa:', error);
+      alert('Đã xảy ra lỗi khi xóa!');
+    }
   }
 
-  onCancel() {
-    this.cancel.emit();
+  handleCancel() {
+    this.onCancel.emit();
   }
 }
