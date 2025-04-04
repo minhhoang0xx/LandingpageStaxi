@@ -1,0 +1,60 @@
+<div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="card p-4" style="width: 400px;">
+      <h2 class="text-center mb-4">LOGIN</h2>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="UserName">UserName</label>
+          <input
+            type="text"
+            id="UserName"
+            class="form-control"
+            formControlName="UserName"
+            [class.is-invalid]="submitted && f['UserName'].errors"
+          />
+          <div *ngIf="submitted && f['UserName'].errors" class="invalid-feedback">
+            <div *ngIf="f['UserName'].errors['required']">Vui lòng nhập tên tài khoản!</div>
+            <div *ngIf="f['UserName'].errors['minlength']">Tên tài khoản phải có ít nhất 6 ký tự!</div>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="Password">Password</label>
+          <input
+            type="password"
+            id="Password"
+            class="form-control"
+            formControlName="Password"
+            [class.is-invalid]="submitted && f['Password'].errors"
+          />
+          <div *ngIf="submitted && f['Password'].errors" class="invalid-feedback">
+            <div *ngIf="f['Password'].errors['required']">Vui lòng nhập mật khẩu!</div>
+            <div *ngIf="f['Password'].errors['minlength']">Mật khẩu phải có ít nhất 6 ký tự!</div>
+          </div>
+        </div>
+  
+        <div *ngIf="showCaptcha" class="form-group text-center">
+          <re-captcha
+            (resolved)="onCaptchaResolved($event)"
+            [siteKey]="siteKey"
+          ></re-captcha>
+        </div>
+  
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" id="rememberMe" formControlName="remember" />
+          <label class="form-check-label" for="rememberMe">Ghi nhớ tôi</label>
+        </div>
+  
+        <div class="form-group text-center">
+          <button [disabled]="loading" type="submit" class="btn btn-primary w-100">
+            {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+          </button>
+          <button type="button" class="btn btn-secondary mt-2 w-100" (click)="goHome()">Trang chủ</button>
+        </div>
+  
+        <p class="text-center mt-3">
+          Không có tài khoản?
+          <a href="#">Đăng ký</a>
+        </p>
+      </form>
+    </div>
+  </div>
