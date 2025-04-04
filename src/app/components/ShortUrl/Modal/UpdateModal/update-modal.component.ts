@@ -2,9 +2,11 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
 import { ShortURLService } from '../../../../services/ShortURLService';
 import { DomainService } from '../../../../services/DomainService';
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-update-modal',
   standalone: true,
@@ -23,7 +25,7 @@ export class UpdateModalComponent implements OnChanges {
 
   shortUrlForm: FormGroup;
   domains: any[] = [];
-  shortUrl: string = '';
+  shortLink: string = '';
   loading: boolean = false;
   isChecked: boolean = false;
   qrCode: string = ''
@@ -32,7 +34,8 @@ export class UpdateModalComponent implements OnChanges {
     private ShortURLService: ShortURLService,
     private domainService: DomainService,
     private router: Router,
-    // private jwtHelper: JwtHelperService
+    private jwtHelper: JwtHelperService,
+    private toastr: ToastrService
   ) {
     this.shortUrlForm = this.fb.group({
       originalUrl: ['', [Validators.required, Validators.pattern(/^\S+$/)]],
@@ -53,6 +56,8 @@ export class UpdateModalComponent implements OnChanges {
       if (this.record) {
         this.shortUrlForm.patchValue(this.record);
         this.isChecked = this.record.checkOS;
+        this.shortLink = this.record.shortLink;
+        this.qrCode = this.record.qrCode;
       }
     }
   }
@@ -72,36 +77,53 @@ export class UpdateModalComponent implements OnChanges {
   async onSubmit() {
     if (this.shortUrlForm.invalid) return;
     this.loading = true;
+        const data = this.shortUrlForm.value;
     try {
-      const updatedData = this.shortUrlForm.value;
-      await this.ShortURLService.updateShortLink(this.record.id, updatedData);
-      alert('Cập nhật thành công!');
+      const selectedDomain = this.domains.find(domain => domain.link === data.domain);
+      data.projectName = selectedDomain.name;
+      data.checkOS = this.isChecked;
+      const token = localStorage.getItem('token'); 
+      const decodedToken = this.jwtHelper.decodeToken(token || '');
+      data.createdByUser = decodedToken['name'];
+      const linkShort = `${data.domain}/${data.alias}`;
+      const qr = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(linkShort)}`;
+      data.qrCode = qr;
+      const res =await firstValueFrom(this.ShortURLService.updateShortLink(this.record.id, data));
+      this.shortLink = linkShort;
+      this.qrCode = this.qrCode;
       this.onUpdate.emit();
-    } catch (error) {
+      this.toastr.success('Cập nhật thành công!');
+    } catch (error: any) {
       console.error('Error updating URL:', error);
-      alert('Cập nhật thất bại!');
+      let err = "Failed to create link.";
+      if (error.response?.data?.message) {
+        err = error.response.data.message;
+      } else if (error.message) {
+        err = error.message;
+      }
+      this.toastr.error('Cập nhật thất bại!');
     }
     this.loading = false;
   }
 
 
   copyToClipboard() {
-    if (this.shortUrl) {
-      navigator.clipboard.writeText(this.shortUrl)
-        .then(() => alert('Link đã được sao chép!'))
-        .catch(() => alert('Không thể sao chép link!'));
+    if (this.shortLink) {
+      navigator.clipboard.writeText(this.shortLink)
+        .then(() => this.toastr.success('Link đã được sao chép!'))
+        .catch(() => this.toastr.error('Không thể sao chép link!'));
     }
   }
 
   openLink() {
-    if (this.shortUrl) {
-      window.open(this.shortUrl, '_blank');
+    if (this.shortLink) {
+      window.open(this.shortLink, '_blank');
     }
   }
 
   resetForm() {
     this.shortUrlForm.reset();
-    this.shortUrl = '';
+    this.shortLink = '';
     this.qrCode = '';
     this.isChecked = false;
   }

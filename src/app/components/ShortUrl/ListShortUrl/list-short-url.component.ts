@@ -8,8 +8,9 @@ import { DeleteModalComponent } from '../Modal/DeleteModal/delete-modal.componen
 import { CreateModalComponent } from '../Modal/CreateModal/create-modal.component';
 import { ShortURLService } from '../../../services/ShortURLService';
 // import { DownloadService } from '';
+import { ToastrService } from 'ngx-toastr';
 import { DomainService } from '../../../services/DomainService';
-// import * as dayjs from 'dayjs';
+import dayjs from 'dayjs'; 
 
 interface ShortLink {
   id: string;
@@ -54,82 +55,52 @@ export class ListShortLinkComponent implements OnInit {
     private router: Router,
     private shortURLService: ShortURLService,
     // private downloadService: DownloadService,
-    private domainService: DomainService
+    private domainService: DomainService,
+    private toastr: ToastrService
   ) { }
 
   columns = [
     { title: 'STT', width: '40px' },
-    { title: 'Dự án', key: 'projectName', width: '100px' },
-    { title: 'Tên đường dẫn', key: 'alias', width: '120px' },
-    { title: 'URL gốc', key: 'originalUrl', width: '560px' },
-    { title: 'Shortlink', key: 'shortLink', width: '280px' },
-    { title: 'Ngày tạo', key: 'createAt', width: '130px' },
-    { title: 'Người chỉnh sửa', key: 'userName', width: '130px' },
+    { title: 'Dự án', key: 'projectName' },
+    { title: 'Tên đường dẫn', key: 'alias' },
+    { title: 'URL gốc', key: 'originalUrl' },
+    { title: 'Shortlink', key: 'shortLink' },
+    { title: 'Ngày tạo', key: 'createAt' },
+    { title: 'Người chỉnh sửa', key: 'userName' },
     { title: 'Chức Năng', width: '90px' }
   ];
 
   ngOnInit() {
-    // this.checkAuth();
+    this.checkAuth();
     this.fetchData();
     this.fetchDomains();
   }
 
-  // checkAuth() {
-  //     const token = localStorage.getItem('token');
-  //     if (!token) {
-  //         this.router.navigate(['/login']);
-  //     }
-  // }
-
-  async fetchData() {
-      this.isLoading = true;
-      try {
-          // Dữ liệu mẫu cơ bản
-          const baseData: ShortLink = {
-              id: "1",
-              STT: 1,
-              projectName: "Project A",
-              alias: "link",
-              originalUrl: "https://example.com/page",
-              shortLink: "https://short.ly/abc",
-              createAt: "2025-03-30 10:00",
-              userName: "user1"
-          };
-          const mockData: ShortLink[] = Array.from({ length: 10 }, (_, index) => ({
-              ...baseData,
-              id: (index + 1).toString(), 
-              STT: index + 1, 
-              alias: `link${index + 1}`, 
-              originalUrl: `https://example.com/page`, 
-              shortLink: `https://short.ly/abc` 
-          }));
-          this.data = mockData;
-          this.filterData();
-          console.log('Filtered Data:', this.filteredData);
-      } catch (error) {
-          console.error('Failed to process data:', error);
-          alert('Failed to load short links');
+  checkAuth() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+          this.router.navigate(['/login']);
       }
-      this.isLoading = false;
   }
 
-  // async fetchData() {
-  //   this.isLoading = true;
-  //   try {
-  //     const urls = await firstValueFrom(this.shortURLService.getAllLinks());
-  //     const formattedData = urls.$values.map((url: any, index: number) => ({
-  //       ...url,
-  //       key: url.id,
-  //       STT: index + 1
-  //     }));
-  //     this.data = formattedData;
-  //     this.filterData();
-  //   } catch (error) {
-  //     console.error('Failed to fetch data:', error);
-  //     alert('Failed to load short links');
-  //   }
-  //   this.isLoading = false;
-  // }
+
+  async fetchData() {
+    this.isLoading = true;
+    try {
+      const urls = await firstValueFrom(this.shortURLService.getAllLinks());
+      const formattedData = urls.$values.map((url: any, index: number) => ({
+        ...url,
+        key: url.id,
+        STT: index + 1
+      }));
+      this.data = formattedData;
+      this.filterData();
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+      this.toastr.error('Failed to load short links');
+    }
+    this.isLoading = false;
+  }
 
   async fetchDomains() {
     try {
@@ -138,7 +109,7 @@ export class ListShortLinkComponent implements OnInit {
       this.domains = response.$values.map((domain: any) => domain.name);
     } catch (error) {
       console.error('Failed to fetch data:', error);
-      alert('Failed to load domain');
+      this.toastr.error('Failed to load domain');
     }
 
 
@@ -162,6 +133,8 @@ export class ListShortLinkComponent implements OnInit {
   openUpdateModal(record: ShortLink) {
     this.selectedRecord = record;
     this.showUpdateModal = true;
+
+    console.log("record", record)
   }
 
   openDeleteModal(record: ShortLink) {
@@ -200,18 +173,21 @@ export class ListShortLinkComponent implements OnInit {
       //   a.remove();
       //   window.URL.revokeObjectURL(url);
     } catch (error) {
-      alert('Export failed!');
+      this.toastr.error('Export failed!');
     }
     this.isLoading = false;
   }
 
   formatDate(date: string): string {
-    //return date ? dayjs(date).format('HH:mm DD/MM/YYYY') : 'N/A';
+    return date ? dayjs(date).format('HH:mm DD/MM/YYYY') : 'N/A';
     return date;
   }
 
-  handleAction() {
+  handleDelete() {
     this.fetchData();
     this.closeModal();
+  }
+  handleAction(){
+    this.fetchData();
   }
 }

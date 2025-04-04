@@ -1,20 +1,20 @@
-// create-modal.component.ts
+
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { FormBuilder, FormGroup, Validators,ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { ShortURLService } from '../../../../services/ShortURLService';
 import { DomainService } from '../../../../services/DomainService';
-// import { JwtHelperService } from '@auth0/angular-jwt';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-create-modal',
   templateUrl: './create-modal.component.html',
   styleUrls: ['./create-modal.component.css'],
   standalone: true,
-  imports: [ 
-    ReactiveFormsModule, 
+  imports: [
+    ReactiveFormsModule,
     CommonModule
   ]
 })
@@ -35,7 +35,8 @@ export class CreateModalComponent implements OnChanges {
     private ShortURLService: ShortURLService,
     private domainService: DomainService,
     private router: Router,
-    // private jwtHelper: JwtHelperService
+    private jwtHelper: JwtHelperService,
+    private toastr: ToastrService
   ) {
     this.shortUrlForm = this.fb.group({
       originalUrl: ['', [Validators.required, Validators.pattern(/^\S+$/)]],
@@ -59,7 +60,7 @@ export class CreateModalComponent implements OnChanges {
 
   async fetchDomains() {
     try {
-      const response = await firstValueFrom( this.domainService.getAll());
+      const response = await firstValueFrom(this.domainService.getAll());
       this.domains = response.$values;
       console.log('domains', response);
     } catch (error) {
@@ -73,6 +74,7 @@ export class CreateModalComponent implements OnChanges {
     if (domain) {
       const combinedUrl = alias ? `${domain}/${alias}` : domain;
       this.shortUrl = combinedUrl;
+      console.log('combinedUrl', combinedUrl)
     }
   }
 
@@ -94,68 +96,69 @@ export class CreateModalComponent implements OnChanges {
   }
 
   async onSubmit() {
-    // if (this.shortUrlForm.invalid) return;
+    if (this.shortUrlForm.invalid) return;
 
-    // this.loading = true;
-    // const data = this.shortUrlForm.value;
+    this.loading = true;
+    const data = this.shortUrlForm.value;
 
-    // try {
-    //   const selectedDomain = this.domains.find(domain => domain.link === data.domain);
-    //   data.projectName = selectedDomain.name;
-    //   data.checkOS = this.isChecked;
+    try {
+      const selectedDomain = this.domains.find(domain => domain.link === data.domain);
+      data.projectName = selectedDomain.name;
+      data.checkOS = this.isChecked;
 
-    //   const token = localStorage.getItem('token'); // Điều chỉnh key theo cấu hình của bạn
-    //   const decodedToken = this.jwtHelper.decodeToken(token || '');
-    //   data.createdByUser = decodedToken['name'];
+      const token = localStorage.getItem('token');
+      const decodedToken = this.jwtHelper.decodeToken(token || '');
+      data.createdByUser = decodedToken['name'];
 
-    //   const linkShort = `${data.domain}/${data.alias}`;
-    //   const qr = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(linkShort)}`;
-    //   data.qrCode = qr;
+      const linkShort = `${data.domain}/${data.alias}`;
+      const qr = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(linkShort)}`;
+      data.qrCode = qr;
 
-    //   const response = await firstValueFrom(this.ShortURLService.createShortLink(data));
-    //   if (response && response.shortLink) {
-    //     alert('Tạo thành công!'); // Có thể thay bằng toast service
-    //     this.shortUrl = linkShort;
-    //     this.qrCode = qrCode;
-    //     this.onCreate.emit();
-    //   } else {
-    //     throw new Error('Tạo thất bại!');
-    //   }
-    // } catch (error) {
-    //   console.error('API Error:', error);
-    //   let err = 'Failed to create link.';
-    //   if (error.error?.message) {
-    //     err = error.error.message;
-    //   } else if (error.message) {
-    //     err = error.message;
-    //   }
-    //   alert(err); // Có thể thay bằng toast service
-    // }
-    // this.loading = false;
+      const response = await firstValueFrom(this.ShortURLService.createShortLink(data));
+      if (response && response.shortLink) {
+        this.shortUrl = linkShort;
+        this.qrCode = qr;
+        console.log('qrcode', this.qrCode)
+        console.log('res', response.shortLink)
+        this.onCreate.emit();
+        this.toastr.success('Tạo thành công!');
+      } else {
+        throw new Error('Tạo thất bại!');
+      }
+    } catch (error: any) {
+      console.error("API Error:", error);
+      let err = "Failed to create link.";
+      if (error.response?.data?.message) {
+        err = error.response.data.message;
+      } else if (error.message) {
+        err = error.message;
+      }
+      this.toastr.error(err); 
+    }
+    this.loading = false;
   }
+    copyToClipboard() {
+      if (this.shortUrl) {
+        navigator.clipboard.writeText(this.shortUrl)
+          .then(() => this.toastr.success('Link đã được sao chép!'))
+          .catch(() => this.toastr.error('Không thể sao chép link!'));
+      }
+    }
 
-  copyToClipboard() {
-    if (this.shortUrl) {
-      navigator.clipboard.writeText(this.shortUrl)
-        .then(() => alert('Link đã được sao chép!'))
-        .catch(() => alert('Không thể sao chép link!'));
+    openLink() {
+      if (this.shortUrl) {
+        window.open(this.shortUrl, '_blank');
+      }
+    }
+
+    resetForm() {
+      this.shortUrlForm.reset();
+      this.shortUrl = '';
+      this.qrCode = '';
+      this.isChecked = false;
+    }
+
+    handleCancel() {
+      this.onCancel.emit();
     }
   }
-
-  openLink() {
-    if (this.shortUrl) {
-      window.open(this.shortUrl, '_blank');
-    }
-  }
-
-  resetForm() {
-    this.shortUrlForm.reset();
-    this.shortUrl = '';
-    this.qrCode = '';
-    this.isChecked = false;
-  }
-
-  handleCancel() {
-    this.onCancel.emit();
-  }
-}
