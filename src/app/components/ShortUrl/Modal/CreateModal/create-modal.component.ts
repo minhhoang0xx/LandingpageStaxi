@@ -34,7 +34,7 @@ export class CreateModalComponent implements OnChanges {
     private fb: FormBuilder,
     private ShortURLService: ShortURLService,
     private domainService: DomainService,
-    private router: Router,
+    private router: Router, 
     private jwtHelper: JwtHelperService,
     private toastr: ToastrService
   ) {

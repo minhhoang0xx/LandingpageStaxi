@@ -7,9 +7,10 @@ import { UpdateModalComponent } from '../Modal/UpdateModal/update-modal.componen
 import { DeleteModalComponent } from '../Modal/DeleteModal/delete-modal.component';
 import { CreateModalComponent } from '../Modal/CreateModal/create-modal.component';
 import { ShortURLService } from '../../../services/ShortURLService';
-// import { DownloadService } from '';
+import { DownloadService } from '../../../services/DownloadService';
 import { ToastrService } from 'ngx-toastr';
 import { DomainService } from '../../../services/DomainService';
+
 import dayjs from 'dayjs'; 
 
 interface ShortLink {
@@ -54,7 +55,7 @@ export class ListShortLinkComponent implements OnInit {
   constructor(
     private router: Router,
     private shortURLService: ShortURLService,
-    // private downloadService: DownloadService,
+    private downloadService: DownloadService,
     private domainService: DomainService,
     private toastr: ToastrService
   ) { }
@@ -160,18 +161,18 @@ export class ListShortLinkComponent implements OnInit {
     this.filterData();
   }
 
-  exportExcel() {
+ async exportExcel() {
     this.isLoading = true;
     try {
-      //   const blob = await firstValueFrom(this.downloadService.download());
-      //   const url = window.URL.createObjectURL(blob);
-      //   const a = document.createElement('a');
-      //   a.href = url;
-      //   a.download = 'Excel.xlsx';
-      //   document.body.appendChild(a);
-      //   a.click();
-      //   a.remove();
-      //   window.URL.revokeObjectURL(url);
+        const blob = await firstValueFrom(this.downloadService.download());
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Excel.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
     } catch (error) {
       this.toastr.error('Export failed!');
     }

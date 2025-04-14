@@ -4,16 +4,18 @@ import { Observable } from 'rxjs';
 import {environment} from '../../environments/environment'
 
 @Injectable({ providedIn: 'root' }) 
-export class DownloadService {
+export class FormRequestService {
   private apiUrl = environment.API_URL; 
 
   constructor(private http: HttpClient) {}
 
 
-  download(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/Download/download`,{responseType: "blob"});
+  saveRequestBAE(data:any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/FormRequest/saveRequestStaxi`,data);
   }
 
-
+  saveRequestStaxi(data:any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/FormRequest/saveRequestStaxi`,data);
+  }
 
 }

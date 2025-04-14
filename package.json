@@ -24,7 +24,7 @@
     "bootstrap-icons": "^1.11.3",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
-    "ng-recaptcha": "^13.2.1",
+    "ng-recaptcha": "^12.0.0",
     "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.0",
     "taiga-ui": "^4.30.0",
