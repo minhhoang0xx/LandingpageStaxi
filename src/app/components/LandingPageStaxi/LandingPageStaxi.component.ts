@@ -1,27 +1,30 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormRequestService } from '../../services/FormRequestService';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import {  RecaptchaModule } from 'ng-recaptcha';
+import { ViewChild } from '@angular/core';
+import { RecaptchaModule, RecaptchaComponent  } from 'ng-recaptcha';
 import { ToastrService } from 'ngx-toastr';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
+
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
   templateUrl: './LandingPageStaxi.component.html',
   styleUrls: ['./LandingPageStaxi.component.css'],
-  imports: [CommonModule, ReactiveFormsModule, RecaptchaModule],
+  imports: [CommonModule, ReactiveFormsModule, RecaptchaModule, RouterModule],
 })
 export class LandingPageStaxiComponent implements OnInit {
   StaxiForm: FormGroup;
   loading = false;
   captchaToken: string | null = null;
   attempts = parseInt(localStorage.getItem('attempts') || '0', 10);
-  showCaptcha = this.attempts >=3;
+  showCaptcha = this.attempts >= 3;
   captchaSiteKey = environment.CAPTCHA_KEY
+  @ViewChild('captchaRef') captchaRef?: RecaptchaComponent;
 
   constructor(
     private fb: FormBuilder,
@@ -31,34 +34,37 @@ export class LandingPageStaxiComponent implements OnInit {
   ) {
     this.StaxiForm = this.fb.group({
       fullName: ['', [Validators.required]],
-      phoneNumber: ['', Validators.required,Validators.pattern(/^\S+$/)],
+      phoneNumber: ['', [Validators.required, Validators.pattern(/^\S+$/)]],
       company: ['', Validators.required],
       email: [''],
       address: [''],
     });
   }
 
-  // bookNow() {
-  //   this.router.navigate(['/booking']);
+  // shortLinkPage() {
+  //   this.router.navigate(['/ShortUrl']);
   // }
 
   ngOnInit(): void {
-    localStorage.setItem('attempts', this.attempts.toString());
-    if (this.attempts >= 3) {
-      this.showCaptcha = true;
+    const attemptsData = localStorage.getItem('attempts');
+    if (attemptsData) {
+      const parsed = JSON.parse(attemptsData);
+      const now = new Date().getTime();
+      if (now < parsed.expiry) {
+        this.attempts = parsed.value;
+      } else {
+        this.attempts = 0;
+        localStorage.removeItem('attempts');
+      }
     }
-    
+    this.showCaptcha = this.attempts >= 3;
   }
-  handleCaptchaChange(token:string | null) {
+  handleCaptchaChange(token: string | null) {
     this.captchaToken = token;
   };
   async onSubmit(): Promise<void> {
     if (this.StaxiForm.invalid) {
       this.toastr.error('Vui lòng điền đầy đủ các trường bắt buộc!');
-      return;
-    }
-    if (this.showCaptcha && !this.captchaToken) {
-      this.toastr.error("Vui lòng hoàn thành CAPTCHA!");
       return;
     }
     this.loading = true
@@ -71,26 +77,23 @@ export class LandingPageStaxiComponent implements OnInit {
         this.StaxiForm.reset();
         this.toastr.success(res.message);
         this.attempts = res.attempts;
-        localStorage.setItem('attempts', this.attempts.toString());
+        const expiryTime = new Date().getTime() + 60 * 60 * 1000; 
+        localStorage.setItem('attempts', JSON.stringify({ value: this.attempts, expiry: expiryTime }));
         this.captchaToken = null;
-        console.log("captcha",this.captchaToken)
+        this.captchaRef?.reset();
         this.showCaptcha = this.attempts >= 3;
-      } else {
-        throw new Error('Tạo thất bại!');
-      }
+      } 
     } catch (error: any) {
       console.error("API Error:", error);
-      let errorMessage = "Failed to submit form.";
-      if (error.res?.message) {
-        errorMessage = error.res.message;
+      let err = "Failed to submit form.";
+      if (error.res?.data.errorMessage) {
+        err = error.res?.data.errorMessage;
         if (error.res.requiresCaptcha) {
           this.showCaptcha = true;
           this.captchaToken = null;
         }
-      } else if (error.message) {
-        errorMessage = error.res.message;
-      }
-      this.toastr.error(errorMessage);
+      } 
+      this.toastr.error(err);
     } finally {
       this.loading = false;
     }

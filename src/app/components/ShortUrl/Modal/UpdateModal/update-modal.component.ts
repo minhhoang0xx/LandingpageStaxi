@@ -95,13 +95,11 @@ export class UpdateModalComponent implements OnChanges {
       this.toastr.success('Cập nhật thành công!');
     } catch (error: any) {
       console.error('Error updating URL:', error);
-      let err = "Failed to create link.";
-      if (error.response?.data?.message) {
-        err = error.response.data.message;
-      } else if (error.message) {
-        err = error.message;
-      }
-      this.toastr.error('Cập nhật thất bại!');
+      let err = "Xảy ra lỗi khi cạp nhật!";
+      if (error.response?.data?.errorMessage) {
+        err = error.response.data.errorMessage;
+      } 
+      this.toastr.error(err);
     }
     this.loading = false;
   }

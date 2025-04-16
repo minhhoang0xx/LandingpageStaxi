@@ -127,12 +127,10 @@ export class CreateModalComponent implements OnChanges {
       }
     } catch (error: any) {
       console.error("API Error:", error);
-      let err = "Failed to create link.";
-      if (error.response?.data?.message) {
-        err = error.response.data.message;
-      } else if (error.message) {
-        err = error.message;
-      }
+      let err = "Xảy ra lỗi khi tạo mới";
+      if (error.response?.data?.errorMessage) {
+        err = error.response.data.errorMessage;
+      } 
       this.toastr.error(err); 
     }
     this.loading = false;

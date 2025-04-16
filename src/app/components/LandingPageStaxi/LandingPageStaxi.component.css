@@ -627,6 +627,8 @@ footer {
 .footer-contact span {
   font-size: 12px;
   line-height: 1.6;
+  color: white;
+  filter: brightness(1000%) saturate(0%);
 }
 
 .footer-contact a {
@@ -659,6 +661,7 @@ footer {
   display: block;
   margin-bottom: 20px;
 }
+
 
 .footer-form {
   display: flex;

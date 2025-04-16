@@ -29,8 +29,15 @@ export const routes: Routes = [
       { path: '', component: NotFoundComponent },
     ]
   },
-  {path:'link/:alias',component: RedirectComponent}
+  { path: 'link/:alias', component: RedirectComponent }
 
 
 
 ];
+
+
+//lazy loading
+// {
+//   path: '',
+//   loadChildren: () => import('./_/_/').then(m => m.xycComponent)
+// }

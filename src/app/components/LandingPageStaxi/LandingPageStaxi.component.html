@@ -16,7 +16,7 @@
           <li><a href="#section-5">Khách hàng</a></li>
           <li><a href="#section-6">Sản phẩm cho taxi</a></li>
           <li><a href="#footer">Tư vấn</a></li>
-          <li><a href="/ShortUrl">Short URL</a></li>
+          <li><a [routerLink] = "['ShortUrl']" >Short URL</a></li>
         </ul>
       </nav>
       <div class="header_contact">
@@ -274,10 +274,10 @@
       <div class="footer-contact">
         <h3>STAXI - MỘT SẢN PHẨM CỦA BA GPS</h3>
         <h4>CÔNG TY TNHH PHÁT TRIỂN CÔNG NGHỆ ĐIỆN TỬ BÌNH ANH</h4>
-        <span>Địa chỉ: Lô 14 phố Nguyễn Cảnh Dị, Q. Hoàng Mai, Hà Nội</span><br>
-        <span>Hotline: 1900 6415 - 1900 6464</span><br>
-        <span>Website: <a href="http://staxi.vn" target="_blank"> http://staxi.vn</a></span><br>
-        <span>Số ĐKKD: 0102306702</span><br>
+        <span>🏠 Địa chỉ: Lô 14 phố Nguyễn Cảnh Dị, Q. Hoàng Mai, Hà Nội</span><br>
+        <span>📞 Hotline: 1900 6415 - 1900 6464</span><br>
+        <span>🌐 Website: <a href="http://staxi.vn" target="_blank"> http://staxi.vn</a></span><br>
+        <span> ✏️Số ĐKKD: 0102306702</span><br>
         <a href="http://online.gov.vn/Home/WebDetails/71521?AspxAutoDetectCookieSupport=1" target="_blank"> <img
             src="/footer.png" alt=""></a>
         <p>Copyright © 2020 BA GPS</p>
@@ -295,8 +295,10 @@
             <input type="text" formControlName="company" placeholder="Công ty*">
             <input type="text" formControlName="address" placeholder="Địa chỉ">
           </div>
-          <re-captcha *ngIf="showCaptcha" (resolved)="handleCaptchaChange($event)" [siteKey]="captchaSiteKey"></re-captcha>
-          <button [disabled]="loading" type="submit">ĐĂNG KÝ NGAY</button>
+          <re-captcha #captchaRef *ngIf="showCaptcha" (resolved)="handleCaptchaChange($event)" [siteKey]="captchaSiteKey"></re-captcha>
+          <button [disabled]="loading" type="submit" class="btn btn-primary w-100">
+            {{ loading ? 'Đang đăng ký...' : 'ĐĂNG KÝ NGAY' }}
+          </button>
         </form>
         <div class="footer-policies">
           <ul>

@@ -49,7 +49,7 @@
               <input type="checkbox" class="form-check-input" id="checkOS" formControlName="checkOS" (change)="handleCheckOSChange()">
               <label class="form-check-label" for="checkOS">Check OS</label>
             </div>
-  
+
             <div *ngIf="isChecked">
               <div class="form-group">
                 <input type="text" class="form-control" formControlName="iosLink" placeholder="Nhập URL App Store">
@@ -67,7 +67,7 @@
               </div>
             </div>
   
-            <button type="submit" class="btn btn-primary btn-block mb-3" [disabled]="loading">Tạo mới</button>
+            <button type="submit" class="btn btn-primary btn-block mb-3" [disabled]="loading">Cập nhật</button>
   
             <div class="form-group">
               <label>Kết quả:</label>

@@ -29,12 +29,15 @@ export class DeleteModalComponent {
       if (response) {
         this.onDelete.emit();
         this.toastr.success('Xóa thành công!');
-      } else {
-        this.toastr.error('Xóa thất bại!');
-      }
-    } catch (error) {
+      } 
+    } catch (error: any) {
       console.error('Lỗi khi xóa:', error);
-      this.toastr.error('Đã xảy ra lỗi khi xóa!');
+      let err = "Đã xảy ra lỗi khi xóa!";
+      if (error.response?.data.errorMessage)
+        {
+          err = error.response?.data.errorMessage
+        }
+      this.toastr.error(err);
     }
   }
 
