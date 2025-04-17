@@ -1,5 +1,4 @@
 import { PreloadAllModules, Routes } from '@angular/router';
-import { LandingPageStaxiComponent } from './components/LandingPageStaxi/LandingPageStaxi.component';
 import { AppComponent } from './app.component'
 import { LayoutComponent } from './shared/layout/layout.component';
 import { NgModule } from '@angular/core';
@@ -12,15 +11,17 @@ import { RedirectComponent } from './shared/redirect/redirect.component';
 
 
 export const routes: Routes = [
-  { path: '', component: LandingPageStaxiComponent },
+  {
+    path: '',
+    loadComponent: () =>
+      import('./components/LandingPageStaxi/LandingPageStaxi.component').then(m => m.LandingPageStaxiComponent),
+  },
   { path: 'login', component: LoginComponent },
   {
     path: 'ShortUrl',
     component: LayoutComponent,
-    canActivate: [authGuard],
-    children: [
-      { path: '', component: ListShortLinkComponent },
-    ]
+    canActivate: [authGuard],   
+    loadChildren: () =>import('./components/ShortUrl/route').then(m=>m.shortUrlRoutes)
   },
   {
     path: '**',
@@ -36,8 +37,5 @@ export const routes: Routes = [
 ];
 
 
-//lazy loading
-// {
-//   path: '',
-//   loadChildren: () => import('./_/_/').then(m => m.xycComponent)
-// }
+
+

@@ -1152,6 +1152,9 @@ footer {
     max-width: 80%;
     margin: 0 auto;
   }
+  .section-5-line{
+    margin-top: -30px;
+  }
 
   .section-5-logo {
     flex-wrap: wrap;
@@ -1196,7 +1199,7 @@ footer {
     font-size: 12px;
   }
   .footer{
-    padding: 50px 20px;
+    padding: 20px 20px 0 20px
   }
 
   .footer-contact h3,
@@ -1316,4 +1319,17 @@ footer {
     gap: 5%;
     padding: 0;
   }
+
+  .footer-contact h4{
+    font-size: 12px;
+  }
+  .footer-contact img{
+    width: 30%;
+    margin-top: 10px
+  }
+  .footer-contact p{
+    font-size: 10px;
+    margin-top: 5px;
+  }
+
 }

@@ -33,9 +33,9 @@ export class DeleteModalComponent {
     } catch (error: any) {
       console.error('Lỗi khi xóa:', error);
       let err = "Đã xảy ra lỗi khi xóa!";
-      if (error.response?.data.errorMessage)
+      if (error.error.errorMessage)
         {
-          err = error.response?.data.errorMessage
+          err = error.error.errorMessage
         }
       this.toastr.error(err);
     }

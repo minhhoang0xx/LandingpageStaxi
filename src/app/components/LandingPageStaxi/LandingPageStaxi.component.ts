@@ -63,10 +63,7 @@ export class LandingPageStaxiComponent implements OnInit {
     this.captchaToken = token;
   };
   async onSubmit(): Promise<void> {
-    if (this.StaxiForm.invalid) {
-      this.toastr.error('Vui lòng điền đầy đủ các trường bắt buộc!');
-      return;
-    }
+
     this.loading = true
     const data = this.StaxiForm.value
     try {
@@ -86,9 +83,10 @@ export class LandingPageStaxiComponent implements OnInit {
     } catch (error: any) {
       console.error("API Error:", error);
       let err = "Failed to submit form.";
-      if (error.res?.data.errorMessage) {
-        err = error.res?.data.errorMessage;
-        if (error.res.requiresCaptcha) {
+      if (error.error.errorMessage) {
+        err = error.error.errorMessage;
+        console.log("123",err)
+        if (error.error.requiresCaptcha) {
           this.showCaptcha = true;
           this.captchaToken = null;
         }

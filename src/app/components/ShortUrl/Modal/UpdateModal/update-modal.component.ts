@@ -96,8 +96,8 @@ export class UpdateModalComponent implements OnChanges {
     } catch (error: any) {
       console.error('Error updating URL:', error);
       let err = "Xảy ra lỗi khi cạp nhật!";
-      if (error.response?.data?.errorMessage) {
-        err = error.response.data.errorMessage;
+      if (error.error.errorMessage) {
+        err = error.error.errorMessage;
       } 
       this.toastr.error(err);
     }

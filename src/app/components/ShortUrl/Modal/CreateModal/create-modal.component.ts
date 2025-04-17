@@ -128,8 +128,8 @@ export class CreateModalComponent implements OnChanges {
     } catch (error: any) {
       console.error("API Error:", error);
       let err = "Xảy ra lỗi khi tạo mới";
-      if (error.response?.data?.errorMessage) {
-        err = error.response.data.errorMessage;
+      if (error.error.errorMessage) {
+        err = error.error.errorMessage;
       } 
       this.toastr.error(err); 
     }
