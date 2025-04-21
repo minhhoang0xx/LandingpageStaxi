@@ -34,8 +34,10 @@
   
         <div *ngIf="showCaptcha" class="form-group text-center">
           <re-captcha
+          #captchaRef
             (resolved)="onCaptchaResolved($event)"
             [siteKey]="siteKey"
+            *ngIf="showCaptcha"
           ></re-captcha>
         </div>
   

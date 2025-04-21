@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common'; 
-import { RecaptchaModule } from 'ng-recaptcha'; 
+import { CommonModule } from '@angular/common';
+import { RecaptchaComponent, RecaptchaModule } from 'ng-recaptcha';
 import { Router } from '@angular/router';
 import { Authentication } from '../../../services/Authentication';
 import { environment } from '../../../../environments/environment';
@@ -14,8 +14,8 @@ import { ToastrService } from 'ngx-toastr';
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    CommonModule,        
-    RecaptchaModule     
+    CommonModule,
+    RecaptchaModule
   ]
 })
 export class LoginComponent {
@@ -26,7 +26,7 @@ export class LoginComponent {
   showCaptcha = false;
   captchaToken: string | null = null;
   siteKey = environment.CAPTCHA_KEY;
-
+  @ViewChild('captchaRef') captchaRef?: RecaptchaComponent;
   constructor(
     private fb: FormBuilder,
     private authService: Authentication,
@@ -39,6 +39,16 @@ export class LoginComponent {
       remember: [false]
     });
   }
+  ngOnInit(): void {
+    const storedAttempts = localStorage.getItem("attempts");
+        const current = storedAttempts ? parseInt(storedAttempts, 10) : 0;
+        this.attempts=current;
+        console.log('submit times', current);
+        localStorage.setItem("attempts", current.toString());
+        if (current >= 3) {
+      this.showCaptcha = true
+        }
+  }
 
   get f() {
     return this.loginForm.controls;
@@ -50,12 +60,7 @@ export class LoginComponent {
 
   async onSubmit() {
     this.submitted = true;
-    if (this.loginForm.invalid || (this.showCaptcha && !this.captchaToken)) {
-      return;
-    }
-
     this.loading = true;
-
     const loginData = {
       ...this.loginForm.value,
       RecaptchaToken: this.captchaToken,
@@ -63,24 +68,34 @@ export class LoginComponent {
 
     try {
       const response = await firstValueFrom(this.authService.login(loginData));
+      this.attempts = response.attempts;
       console.log('API Response:', response);
       if (response.message === 'Login successfully!') {
         localStorage.setItem('token', response.token)
         this.router.navigate(['ShortUrl']);
-        this.attempts = 0;
         this.showCaptcha = false;
         this.captchaToken = null;
-        this.toastr.success('Đăng nhập thành công!');
-      } else {
-        this.toastr.error(response.message);
+        this.toastr.success(response.message);
+        if (this.captchaRef) {
+          this.captchaRef.reset();
+        }
       }
-    } catch (error) {
-      this.attempts++;
-      if (this.attempts >= 3) {
-        this.showCaptcha = true;
-        this.captchaToken = null;
+    } catch (error: any) {
+      let err = "Đăng nhập thất bại!";
+      this.attempts = error.error.attempts;
+      localStorage.setItem('attempts', this.attempts.toString());
+      if (error.error.errorMessage) {
+        err = error.error.errorMessage;
+        if (error.error.requiresCaptcha) {
+          this.showCaptcha = true;
+          this.captchaToken = null;
+          if (this.captchaRef) {
+            this.captchaRef.reset();
+          }
+        }
       }
-      this.toastr.error('Đăng nhập thất bại!');
+
+      this.toastr.error(err);
       console.error(error);
     }
 

@@ -122,8 +122,6 @@ export class CreateModalComponent implements OnChanges {
         console.log('res', response.shortLink)
         this.onCreate.emit();
         this.toastr.success('Tạo thành công!');
-      } else {
-        throw new Error('Tạo thất bại!');
       }
     } catch (error: any) {
       console.error("API Error:", error);

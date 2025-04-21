@@ -113,7 +113,6 @@ export class ListShortLinkComponent implements OnInit {
       this.toastr.error('Failed to load domain');
     }
 
-
   }
 
   filterData() {
