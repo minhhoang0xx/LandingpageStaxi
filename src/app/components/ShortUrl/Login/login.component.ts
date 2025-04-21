@@ -41,13 +41,22 @@ export class LoginComponent {
   }
   ngOnInit(): void {
     const storedAttempts = localStorage.getItem("login_attempts");
-        const current = storedAttempts ? parseInt(storedAttempts, 10) : 0;
-        this.attempts=current;
-        console.log('submit times', current);
-        localStorage.setItem("login_attempts", current.toString());
-        if (current >= 3) {
-      this.showCaptcha = true
+    if (storedAttempts) {
+      const parsed = JSON.parse(storedAttempts);
+      const now = Date.now();
+      if (parsed.expiry && now < parsed.expiry) {
+        this.attempts = parsed.value;
+        if (parsed.value >= 3) {
+          this.showCaptcha = true;
         }
+      } else {
+        localStorage.removeItem("login_attempts");
+        this.attempts = 0
+        this.showCaptcha = false
+      }
+
+    }
+
   }
 
   get f() {
@@ -84,7 +93,8 @@ export class LoginComponent {
     } catch (error: any) {
       let err = "Đăng nhập thất bại!";
       this.attempts = error.error.attempts;
-      localStorage.setItem('login_attempts', this.attempts.toString());
+      const expiryTime = Date.now() + 60 * 60 * 1000;
+      localStorage.setItem("login_attempts", JSON.stringify({ value: this.attempts, expiry: expiryTime }));
       if (error.error.errorMessage) {
         err = error.error.errorMessage;
         if (error.error.requiresCaptcha) {
