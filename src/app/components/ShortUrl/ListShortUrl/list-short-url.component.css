@@ -58,8 +58,8 @@
 th:nth-child(1), td:nth-child(1) { width: 40px; max-width: 40px; }
 th:nth-child(2), td:nth-child(2) { width: 100px; max-width: 100px; } 
 th:nth-child(3), td:nth-child(3) { width: 120px; max-width: 120px; } 
-th:nth-child(4), td:nth-child(4) { width: 540px; max-width: 540px; } 
-th:nth-child(5), td:nth-child(5) { width: 280px; max-width: 280px; } 
+th:nth-child(4), td:nth-child(4) { width: 540px; max-width: 500px; } 
+th:nth-child(5), td:nth-child(5) { width: 280px; max-width: 250px; } 
 th:nth-child(6), td:nth-child(6) { width: 130px; max-width: 130px; } 
-th:nth-child(7), td:nth-child(7) { width: 120px; max-width: 130px; } 
-th:nth-child(8), td:nth-child(8) { width: 90px; max-width: 90px; } 
+th:nth-child(7), td:nth-child(7) { width: 120px; max-width: 125px; } 
+th:nth-child(8), td:nth-child(8) { width: 90px; max-width: 85px; } 

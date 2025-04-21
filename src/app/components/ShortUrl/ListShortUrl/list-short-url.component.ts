@@ -65,7 +65,7 @@ export class ListShortLinkComponent implements OnInit {
     { title: 'Dự án', key: 'projectName' },
     { title: 'Tên đường dẫn', key: 'alias' },
     { title: 'URL gốc', key: 'originalUrl' },
-    { title: 'Shortlink', key: 'shortLink' },
+    { title: 'URL rút gọn', key: 'shortLink' },
     { title: 'Ngày tạo', key: 'createAt' },
     { title: 'Người chỉnh sửa', key: 'userName' },
     { title: 'Chức Năng', width: '90px' }
@@ -92,7 +92,9 @@ export class ListShortLinkComponent implements OnInit {
       const formattedData = urls.$values.map((url: any, index: number) => ({
         ...url,
         key: url.id,
-        STT: index + 1
+        STT: index + 1,
+        createAt: this.formatDate(url.createAt)
+
       }));
       this.data = formattedData;
       this.filterData();
@@ -180,7 +182,6 @@ export class ListShortLinkComponent implements OnInit {
 
   formatDate(date: string): string {
     return date ? dayjs(date).format('HH:mm DD/MM/YYYY') : 'N/A';
-    return date;
   }
 
   handleDelete() {

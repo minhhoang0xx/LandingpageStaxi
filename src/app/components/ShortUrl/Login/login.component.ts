@@ -40,11 +40,11 @@ export class LoginComponent {
     });
   }
   ngOnInit(): void {
-    const storedAttempts = localStorage.getItem("attempts");
+    const storedAttempts = localStorage.getItem("login_attempts");
         const current = storedAttempts ? parseInt(storedAttempts, 10) : 0;
         this.attempts=current;
         console.log('submit times', current);
-        localStorage.setItem("attempts", current.toString());
+        localStorage.setItem("login_attempts", current.toString());
         if (current >= 3) {
       this.showCaptcha = true
         }
@@ -70,8 +70,9 @@ export class LoginComponent {
       const response = await firstValueFrom(this.authService.login(loginData));
       this.attempts = response.attempts;
       console.log('API Response:', response);
-      if (response.message === 'Login successfully!') {
+      if (response && response.message) {
         localStorage.setItem('token', response.token)
+        localStorage.removeItem("login_attempts")
         this.router.navigate(['ShortUrl']);
         this.showCaptcha = false;
         this.captchaToken = null;
@@ -83,7 +84,7 @@ export class LoginComponent {
     } catch (error: any) {
       let err = "Đăng nhập thất bại!";
       this.attempts = error.error.attempts;
-      localStorage.setItem('attempts', this.attempts.toString());
+      localStorage.setItem('login_attempts', this.attempts.toString());
       if (error.error.errorMessage) {
         err = error.error.errorMessage;
         if (error.error.requiresCaptcha) {
